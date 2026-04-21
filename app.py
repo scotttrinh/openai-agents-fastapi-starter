@@ -13,7 +13,6 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from openai.types.responses import ResponseTextDeltaEvent
 from pydantic import BaseModel, Field
-from vercel.headers import set_headers
 
 from agents import ModelSettings, Runner
 from agents.exceptions import AgentsException, UserError
@@ -62,15 +61,6 @@ class RunRequest(BaseModel):
 
 
 STATIC_DIR = Path(__file__).parent / "static"
-
-
-@app.middleware("http")
-async def set_vercel_request_headers(request: Request, call_next):
-    set_headers(dict(request.headers))
-    try:
-        return await call_next(request)
-    finally:
-        set_headers(None)
 
 
 def _sse(event: str, data: object) -> str:
